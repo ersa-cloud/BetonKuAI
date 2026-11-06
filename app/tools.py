@@ -1,10 +1,21 @@
+
 """
 BetonKu AI Assistant - Tool Functions for AI Function Calling
-Definisi fungsi-fungsi yang dapat dipanggil oleh AI Agent melalui Function Calling.
+
+Definisi fungsi-fungsi yang dapat dipanggil oleh AI Agent
+melalui OpenAI-compatible Function Calling.
+
+Mode deployment:
+- Membaca data produk dan perusahaan dari JSON.
+- Membaca data pesanan dan keluhan contoh dari JSON.
+- Pembuatan pesanan hanya berupa simulasi.
+- Pembuatan keluhan hanya berupa simulasi.
+- Tidak ada penyimpanan transaksi permanen.
 """
 
 import math
 from typing import Any
+
 from app.data_manager import (
     get_all_products,
     get_product_by_id,
@@ -20,26 +31,35 @@ from app.data_manager import (
 )
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# DEFINISI TOOLS UNTUK OPENAI FUNCTION CALLING
-# ═══════════════════════════════════════════════════════════════════════════════
+# ============================================================
+# TOOL DEFINITIONS
+# ============================================================
 
 TOOLS_DEFINITION = [
+
+    # --------------------------------------------------------
+    # 1. GET PRODUCT CATALOG
+    # --------------------------------------------------------
+
     {
         "type": "function",
         "function": {
             "name": "get_product_catalog",
             "description": (
-                "Mengambil katalog lengkap semua produk beton ready-mix BetonKu beserta harga terbaru. "
-                "Panggil fungsi ini ketika pelanggan bertanya tentang produk, jenis beton, daftar harga, "
-                "atau ingin membandingkan spesifikasi antar produk."
+                "Mengambil katalog lengkap semua produk beton ready-mix BetonKu "
+                "beserta harga dan spesifikasinya. "
+                "Panggil fungsi ini ketika pelanggan bertanya tentang produk, "
+                "jenis beton, daftar harga, atau ingin membandingkan produk."
             ),
             "parameters": {
                 "type": "object",
                 "properties": {
                     "filter_availability": {
                         "type": "string",
-                        "description": "Filter berdasarkan ketersediaan: 'tersedia', 'indent', atau 'semua' (default).",
+                        "description": (
+                            "Filter ketersediaan produk: "
+                            "'tersedia', 'indent', atau 'semua'."
+                        ),
                         "enum": ["tersedia", "indent", "semua"]
                     }
                 },
@@ -47,52 +67,74 @@ TOOLS_DEFINITION = [
             }
         }
     },
+
+    # --------------------------------------------------------
+    # 2. GET PRODUCT DETAIL
+    # --------------------------------------------------------
+
     {
         "type": "function",
         "function": {
             "name": "get_product_detail",
             "description": (
-                "Mengambil detail spesifik satu produk beton berdasarkan ID produk. "
-                "Panggil ini ketika pelanggan menanyakan detail produk tertentu seperti K200, K300, SCC, dll."
+                "Mengambil detail spesifik satu produk beton berdasarkan ID. "
+                "Panggil ketika pelanggan menanyakan spesifikasi produk tertentu."
             ),
             "parameters": {
                 "type": "object",
                 "properties": {
                     "product_id": {
                         "type": "string",
-                        "description": "ID produk beton, contoh: 'K175', 'K200', 'K225', 'K250', 'K300', 'K350', 'K400', 'SCC', 'FC'"
+                        "description": (
+                            "ID produk beton, contoh: K175, K200, K225, "
+                            "K250, K300, K350, K400, SCC, atau FC."
+                        )
                     }
                 },
                 "required": ["product_id"]
             }
         }
     },
+
+    # --------------------------------------------------------
+    # 3. CALCULATE CONCRETE VOLUME
+    # --------------------------------------------------------
+
     {
         "type": "function",
         "function": {
             "name": "calculate_concrete_volume",
             "description": (
-                "Menghitung kebutuhan volume beton berdasarkan dimensi elemen struktur proyek. "
-                "Panggil fungsi ini ketika pelanggan ingin menghitung kebutuhan beton untuk "
-                "pondasi, kolom, balok, plat lantai, jalan, atau elemen lainnya."
+                "Menghitung kebutuhan volume beton berdasarkan dimensi "
+                "elemen struktur proyek seperti pondasi, kolom, balok, "
+                "plat lantai, jalan, dan dinding."
             ),
             "parameters": {
                 "type": "object",
                 "properties": {
                     "element_type": {
                         "type": "string",
-                        "description": "Tipe elemen struktur: 'balok_lantai', 'kolom', 'pondasi_telapak', 'pondasi_bored_pile', 'plat_lantai', 'jalan', 'dinding', 'custom'",
-                        "enum": ["balok_lantai", "kolom", "pondasi_telapak", "pondasi_bored_pile", "plat_lantai", "jalan", "dinding", "custom"]
+                        "description": "Jenis elemen struktur.",
+                        "enum": [
+                            "balok_lantai",
+                            "kolom",
+                            "pondasi_telapak",
+                            "pondasi_bored_pile",
+                            "plat_lantai",
+                            "jalan",
+                            "dinding",
+                            "custom"
+                        ]
                     },
                     "dimensions": {
                         "type": "object",
                         "description": (
-                            "Dimensi elemen dalam meter. "
-                            "Untuk balok/lantai/jalan/dinding: {'panjang': float, 'lebar': float, 'tebal_atau_tinggi': float}. "
-                            "Untuk kolom: {'lebar': float, 'tebal': float, 'tinggi': float}. "
-                            "Untuk pondasi telapak: {'panjang': float, 'lebar': float, 'tebal': float}. "
-                            "Untuk bored pile: {'diameter': float, 'kedalaman': float}. "
-                            "Untuk custom: {'volume_m3': float} (input langsung volume)."
+                            "Dimensi dalam meter. "
+                            "Untuk balok, plat, jalan: panjang, lebar, tebal_atau_tinggi. "
+                            "Untuk kolom: lebar, tebal, tinggi. "
+                            "Untuk pondasi telapak: panjang, lebar, tebal. "
+                            "Untuk bored pile: diameter, kedalaman. "
+                            "Untuk custom: volume_m3."
                         ),
                         "properties": {
                             "panjang": {"type": "number"},
@@ -107,145 +149,260 @@ TOOLS_DEFINITION = [
                     },
                     "quantity": {
                         "type": "integer",
-                        "description": "Jumlah elemen yang sama (default: 1)"
+                        "description": "Jumlah elemen yang sama. Default 1."
                     },
                     "waste_factor_percent": {
                         "type": "number",
-                        "description": "Faktor tambahan untuk waste/susut dalam persen (default: 5%)"
+                        "description": "Persentase tambahan waste. Default 5%."
                     },
                     "product_id": {
                         "type": "string",
-                        "description": "Opsional: ID produk beton untuk menghitung estimasi biaya sekaligus (contoh: 'K250')"
+                        "description": (
+                            "Opsional: ID produk beton untuk menghitung "
+                            "estimasi biaya, misalnya K250."
+                        )
                     }
                 },
                 "required": ["element_type", "dimensions"]
             }
         }
     },
+
+    # --------------------------------------------------------
+    # 4. GET COMPANY INFORMATION
+    # --------------------------------------------------------
+
     {
         "type": "function",
         "function": {
             "name": "get_company_information",
             "description": (
-                "Mengambil informasi lengkap tentang perusahaan BetonKu: profil, kontak, lokasi batching plant, "
-                "sertifikasi, kapasitas produksi, area layanan, FAQ, info pengiriman, dan syarat pembayaran. "
-                "Panggil ini untuk pertanyaan umum tentang perusahaan."
+                "Mengambil informasi perusahaan BetonKu seperti profil, "
+                "kontak, lokasi, kapasitas produksi, area layanan, FAQ, "
+                "informasi pengiriman, dan ketentuan pembayaran."
             ),
             "parameters": {
                 "type": "object",
                 "properties": {
                     "info_type": {
                         "type": "string",
-                        "description": "Jenis informasi: 'profil', 'kontak', 'pengiriman', 'pembayaran', 'faq', 'semua'",
-                        "enum": ["profil", "kontak", "pengiriman", "pembayaran", "faq", "semua"]
+                        "description": "Jenis informasi yang dibutuhkan.",
+                        "enum": [
+                            "profil",
+                            "kontak",
+                            "pengiriman",
+                            "pembayaran",
+                            "faq",
+                            "semua"
+                        ]
                     }
                 },
                 "required": ["info_type"]
             }
         }
     },
+
+    # --------------------------------------------------------
+    # 5. CREATE ORDER REQUEST - SIMULATION
+    # --------------------------------------------------------
+
     {
         "type": "function",
         "function": {
             "name": "create_order_request",
             "description": (
-                "Membuat permintaan pesanan beton baru dan menyimpannya ke sistem. "
-                "Panggil fungsi ini HANYA ketika pelanggan sudah memberikan semua informasi yang diperlukan "
-                "dan secara eksplisit meminta untuk membuat pesanan."
+                "Membuat SIMULASI permintaan pesanan beton. "
+                "Panggil hanya ketika pelanggan sudah memberikan semua "
+                "informasi yang diperlukan dan secara eksplisit meminta "
+                "untuk membuat pesanan. "
+                "Pesanan hanya untuk demonstrasi dan TIDAK disimpan permanen. "
+                "Jangan menyebut pesanan sebagai transaksi resmi."
             ),
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "customer_name": {"type": "string", "description": "Nama perusahaan atau pelanggan"},
-                    "contact_person": {"type": "string", "description": "Nama orang yang dapat dihubungi"},
-                    "phone": {"type": "string", "description": "Nomor telepon/WhatsApp aktif"},
-                    "email": {"type": "string", "description": "Alamat email aktif"},
-                    "project_name": {"type": "string", "description": "Nama proyek konstruksi"},
-                    "project_address": {"type": "string", "description": "Alamat lokasi proyek secara lengkap"},
-                    "product_id": {"type": "string", "description": "ID produk beton yang dipesan (contoh: K300)"},
-                    "volume_m3": {"type": "number", "description": "Volume beton yang dibutuhkan dalam m³"},
-                    "delivery_date": {"type": "string", "description": "Tanggal pengiriman yang diinginkan (format: YYYY-MM-DD)"},
-                    "notes": {"type": "string", "description": "Catatan tambahan untuk pesanan (opsional)"}
+                    "customer_name": {
+                        "type": "string",
+                        "description": "Nama perusahaan atau pelanggan."
+                    },
+                    "contact_person": {
+                        "type": "string",
+                        "description": "Nama orang yang dapat dihubungi."
+                    },
+                    "phone": {
+                        "type": "string",
+                        "description": "Nomor telepon atau WhatsApp."
+                    },
+                    "email": {
+                        "type": "string",
+                        "description": "Alamat email pelanggan."
+                    },
+                    "project_name": {
+                        "type": "string",
+                        "description": "Nama proyek konstruksi."
+                    },
+                    "project_address": {
+                        "type": "string",
+                        "description": "Alamat lengkap lokasi proyek."
+                    },
+                    "product_id": {
+                        "type": "string",
+                        "description": "ID produk beton, contoh K300."
+                    },
+                    "volume_m3": {
+                        "type": "number",
+                        "description": "Volume beton dalam meter kubik."
+                    },
+                    "delivery_date": {
+                        "type": "string",
+                        "description": "Tanggal pengiriman format YYYY-MM-DD."
+                    },
+                    "notes": {
+                        "type": "string",
+                        "description": "Catatan tambahan, opsional."
+                    }
                 },
-                "required": ["customer_name", "contact_person", "phone", "email",
-                             "project_name", "project_address", "product_id", "volume_m3", "delivery_date"]
+                "required": [
+                    "customer_name",
+                    "contact_person",
+                    "phone",
+                    "email",
+                    "project_name",
+                    "project_address",
+                    "product_id",
+                    "volume_m3",
+                    "delivery_date"
+                ]
             }
         }
     },
+
+    # --------------------------------------------------------
+    # 6. CHECK ORDER STATUS
+    # --------------------------------------------------------
+
     {
         "type": "function",
         "function": {
             "name": "check_order_status",
             "description": (
                 "Memeriksa status pesanan berdasarkan nomor order ID. "
-                "Panggil ini ketika pelanggan ingin mengetahui status pesanannya."
+                "Pencarian menggunakan data pesanan contoh yang tersedia."
             ),
             "parameters": {
                 "type": "object",
                 "properties": {
                     "order_id": {
                         "type": "string",
-                        "description": "Nomor ID pesanan, contoh: 'BK-2025-001'"
+                        "description": (
+                            "Nomor ID pesanan, contoh BK-2025-001."
+                        )
                     }
                 },
                 "required": ["order_id"]
             }
         }
     },
+
+    # --------------------------------------------------------
+    # 7. SUBMIT COMPLAINT - SIMULATION
+    # --------------------------------------------------------
+
     {
         "type": "function",
         "function": {
             "name": "submit_complaint",
             "description": (
-                "Mencatat dan mengirimkan keluhan pelanggan ke sistem. "
-                "Panggil ini ketika pelanggan ingin melaporkan keluhan terkait kualitas produk, "
-                "pengiriman, layanan, atau masalah lainnya."
+                "Membuat SIMULASI pengaduan pelanggan terkait kualitas "
+                "produk, pengiriman, administrasi, layanan, atau masalah lainnya. "
+                "Panggil ketika pelanggan ingin mencoba membuat pengaduan. "
+                "Pengaduan hanya simulasi, tidak dikirim ke admin, "
+                "dan tidak disimpan secara permanen."
             ),
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "customer_name": {"type": "string", "description": "Nama perusahaan atau pelanggan"},
-                    "contact_person": {"type": "string", "description": "Nama orang yang dapat dihubungi"},
-                    "phone": {"type": "string", "description": "Nomor telepon aktif"},
-                    "email": {"type": "string", "description": "Alamat email"},
+                    "customer_name": {
+                        "type": "string",
+                        "description": "Nama perusahaan atau pelanggan."
+                    },
+                    "contact_person": {
+                        "type": "string",
+                        "description": "Nama orang yang dapat dihubungi."
+                    },
+                    "phone": {
+                        "type": "string",
+                        "description": "Nomor telepon pelanggan."
+                    },
+                    "email": {
+                        "type": "string",
+                        "description": "Alamat email pelanggan."
+                    },
                     "category": {
                         "type": "string",
-                        "description": "Kategori keluhan",
-                        "enum": ["kualitas", "pengiriman", "administrasi", "layanan", "lainnya"]
+                        "description": "Kategori keluhan.",
+                        "enum": [
+                            "kualitas",
+                            "pengiriman",
+                            "administrasi",
+                            "layanan",
+                            "lainnya"
+                        ]
                     },
-                    "subject": {"type": "string", "description": "Judul singkat keluhan"},
-                    "description": {"type": "string", "description": "Deskripsi lengkap keluhan"},
-                    "related_order_id": {"type": "string", "description": "Nomor order terkait (opsional, contoh: BK-2025-001)"}
+                    "subject": {
+                        "type": "string",
+                        "description": "Judul singkat keluhan."
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Deskripsi lengkap keluhan."
+                    },
+                    "related_order_id": {
+                        "type": "string",
+                        "description": "Nomor pesanan terkait, opsional."
+                    }
                 },
-                "required": ["customer_name", "contact_person", "phone", "email",
-                             "category", "subject", "description"]
+                "required": [
+                    "customer_name",
+                    "contact_person",
+                    "phone",
+                    "email",
+                    "category",
+                    "subject",
+                    "description"
+                ]
             }
         }
     },
+
+    # --------------------------------------------------------
+    # 8. REQUEST ADMIN HANDOFF
+    # --------------------------------------------------------
+
     {
         "type": "function",
         "function": {
             "name": "request_admin_handoff",
             "description": (
-                "Meminta pengalihan percakapan kepada admin/sales BetonKu secara langsung. "
-                "Panggil ini ketika: pelanggan secara eksplisit meminta berbicara dengan admin/manusia, "
-                "pertanyaan terlalu kompleks dan membutuhkan negosiasi harga, atau ada masalah mendesak "
-                "yang tidak dapat ditangani oleh AI."
+                "Memberikan informasi kontak admin BetonKu ketika pelanggan "
+                "meminta berbicara dengan manusia, membutuhkan negosiasi harga, "
+                "atau memiliki masalah yang tidak dapat ditangani AI. "
+                "Fungsi ini tidak mengirim notifikasi langsung kepada admin."
             ),
             "parameters": {
                 "type": "object",
                 "properties": {
                     "reason": {
                         "type": "string",
-                        "description": "Alasan pengalihan ke admin"
+                        "description": "Alasan pengalihan ke admin."
                     },
                     "customer_name": {
                         "type": "string",
-                        "description": "Nama pelanggan (jika sudah diketahui)"
+                        "description": "Nama pelanggan jika diketahui."
                     },
                     "urgency": {
                         "type": "string",
-                        "description": "Tingkat urgensi: 'normal', 'segera', 'darurat'",
+                        "description": "Tingkat urgensi.",
                         "enum": ["normal", "segera", "darurat"]
                     }
                 },
@@ -256,18 +413,25 @@ TOOLS_DEFINITION = [
 ]
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# IMPLEMENTASI HANDLER SETIAP TOOL
-# ═══════════════════════════════════════════════════════════════════════════════
+# ============================================================
+# PRODUCT HANDLERS
+# ============================================================
 
-def handle_get_product_catalog(filter_availability: str = "semua") -> dict:
-    """Handler: Mengambil katalog produk, bisa difilter berdasarkan ketersediaan."""
+def handle_get_product_catalog(
+    filter_availability: str = "semua"
+) -> dict:
+    """Mengambil katalog produk."""
+
     products = get_all_products()
     services = get_additional_services()
     notes = get_price_notes()
 
     if filter_availability != "semua":
-        products = [p for p in products if p.get("availability") == filter_availability]
+        products = [
+            product
+            for product in products
+            if product.get("availability") == filter_availability
+        ]
 
     return {
         "status": "success",
@@ -279,16 +443,28 @@ def handle_get_product_catalog(filter_availability: str = "semua") -> dict:
 
 
 def handle_get_product_detail(product_id: str) -> dict:
-    """Handler: Mengambil detail satu produk berdasarkan ID."""
+    """Mengambil detail produk."""
+
     product = get_product_by_id(product_id)
+
     if not product:
         return {
             "status": "not_found",
             "message": f"Produk dengan ID '{product_id}' tidak ditemukan.",
-            "suggestion": "ID produk yang tersedia: K175, K200, K225, K250, K300, K350, K400, SCC, FC"
+            "suggestion": (
+                "Periksa kembali ID produk yang diminta pelanggan."
+            )
         }
-    return {"status": "success", "product": product}
 
+    return {
+        "status": "success",
+        "product": product
+    }
+
+
+# ============================================================
+# CONCRETE VOLUME CALCULATOR
+# ============================================================
 
 def handle_calculate_concrete_volume(
     element_type: str,
@@ -297,10 +473,20 @@ def handle_calculate_concrete_volume(
     waste_factor_percent: float = 5.0,
     product_id: str = None
 ) -> dict:
-    """
-    Handler: Menghitung volume beton berdasarkan tipe elemen dan dimensinya.
-    Mengembalikan volume bersih, volume dengan waste, dan estimasi biaya jika product_id diberikan.
-    """
+    """Menghitung kebutuhan volume beton dan estimasi biaya."""
+
+    if quantity < 1:
+        return {
+            "status": "error",
+            "message": "Jumlah elemen minimal 1."
+        }
+
+    if waste_factor_percent < 0:
+        return {
+            "status": "error",
+            "message": "Persentase waste tidak boleh negatif."
+        }
+
     volume_per_unit = 0.0
     calculation_detail = ""
 
@@ -308,71 +494,101 @@ def handle_calculate_concrete_volume(
         if element_type == "balok_lantai":
             p = dimensions["panjang"]
             l = dimensions["lebar"]
-            t = dimensions.get("tebal_atau_tinggi", dimensions.get("tebal", 0))
+            t = dimensions.get(
+                "tebal_atau_tinggi",
+                dimensions.get("tebal", 0)
+            )
+
             volume_per_unit = p * l * t
-            calculation_detail = f"Balok/Lantai: {p}m × {l}m × {t}m = {volume_per_unit:.3f} m³/unit"
+            calculation_detail = f"{p} × {l} × {t}"
 
         elif element_type == "kolom":
             l = dimensions["lebar"]
-            t = dimensions.get("tebal", dimensions.get("lebar", 0))
-            h = dimensions.get("tinggi", dimensions.get("tebal_atau_tinggi", 0))
+            t = dimensions.get("tebal", l)
+            h = dimensions.get(
+                "tinggi",
+                dimensions.get("tebal_atau_tinggi", 0)
+            )
+
             volume_per_unit = l * t * h
-            calculation_detail = f"Kolom: {l}m × {t}m × {h}m = {volume_per_unit:.3f} m³/unit"
+            calculation_detail = f"{l} × {t} × {h}"
 
         elif element_type == "pondasi_telapak":
             p = dimensions["panjang"]
             l = dimensions["lebar"]
-            t = dimensions.get("tebal", dimensions.get("tebal_atau_tinggi", 0))
+            t = dimensions.get(
+                "tebal",
+                dimensions.get("tebal_atau_tinggi", 0)
+            )
+
             volume_per_unit = p * l * t
-            calculation_detail = f"Pondasi Telapak: {p}m × {l}m × {t}m = {volume_per_unit:.3f} m³/unit"
+            calculation_detail = f"{p} × {l} × {t}"
 
         elif element_type == "pondasi_bored_pile":
             d = dimensions["diameter"]
-            k = dimensions["kedalaman"]
-            radius = d / 2
-            volume_per_unit = math.pi * (radius ** 2) * k
-            calculation_detail = f"Bored Pile: π × (Ø{d}m/2)² × {k}m = {volume_per_unit:.3f} m³/unit"
+            depth = dimensions["kedalaman"]
 
-        elif element_type == "plat_lantai":
+            volume_per_unit = math.pi * (d / 2) ** 2 * depth
+            calculation_detail = (
+                f"π × ({d}/2)² × {depth}"
+            )
+
+        elif element_type in ("plat_lantai", "jalan"):
             p = dimensions["panjang"]
             l = dimensions["lebar"]
-            t = dimensions.get("tebal_atau_tinggi", dimensions.get("tebal", 0))
-            volume_per_unit = p * l * t
-            calculation_detail = f"Plat Lantai: {p}m × {l}m × {t}m = {volume_per_unit:.3f} m³/unit"
+            t = dimensions.get(
+                "tebal_atau_tinggi",
+                dimensions.get("tebal", 0)
+            )
 
-        elif element_type == "jalan":
-            p = dimensions["panjang"]
-            l = dimensions["lebar"]
-            t = dimensions.get("tebal_atau_tinggi", dimensions.get("tebal", 0))
             volume_per_unit = p * l * t
-            calculation_detail = f"Jalan Beton: {p}m × {l}m × {t}m = {volume_per_unit:.3f} m³/unit"
+            calculation_detail = f"{p} × {l} × {t}"
 
         elif element_type == "dinding":
             p = dimensions["panjang"]
-            t = dimensions.get("tebal_atau_tinggi", dimensions.get("tebal", 0))
-            h = dimensions.get("tinggi", 0)
+            t = dimensions.get(
+                "tebal_atau_tinggi",
+                dimensions.get("tebal", 0)
+            )
+            h = dimensions["tinggi"]
+
             volume_per_unit = p * t * h
-            calculation_detail = f"Dinding: {p}m × {t}m × {h}m = {volume_per_unit:.3f} m³/unit"
+            calculation_detail = f"{p} × {t} × {h}"
 
         elif element_type == "custom":
-            volume_per_unit = dimensions.get("volume_m3", 0)
-            calculation_detail = f"Custom: volume langsung = {volume_per_unit:.3f} m³/unit"
+            volume_per_unit = dimensions["volume_m3"]
+            calculation_detail = (
+                f"Volume langsung: {volume_per_unit} m³"
+            )
 
         else:
-            return {"status": "error", "message": f"Tipe elemen '{element_type}' tidak dikenali."}
+            return {
+                "status": "error",
+                "message": "Jenis elemen struktur tidak dikenali."
+            }
 
-    except KeyError as e:
+    except KeyError as error:
         return {
             "status": "error",
-            "message": f"Dimensi yang diperlukan tidak lengkap: {str(e)}. "
-                       f"Pastikan semua dimensi dalam meter sudah diisi."
+            "message": (
+                f"Dimensi {error} belum diberikan. "
+                "Lengkapi seluruh dimensi dalam satuan meter."
+            )
         }
 
-    # Hitung total volume
+    if volume_per_unit <= 0:
+        return {
+            "status": "error",
+            "message": "Dimensi harus menghasilkan volume lebih besar dari 0."
+        }
+
     volume_net = volume_per_unit * quantity
-    waste_factor = waste_factor_percent / 100
-    volume_with_waste = volume_net * (1 + waste_factor)
-    # Pembulatan ke atas ke kelipatan 0.5 m³
+
+    volume_with_waste = volume_net * (
+        1 + waste_factor_percent / 100
+    )
+
+    # Pembulatan ke atas ke kelipatan 0,5 m³
     volume_ordered = math.ceil(volume_with_waste * 2) / 2
 
     result: dict[str, Any] = {
@@ -387,15 +603,18 @@ def handle_calculate_concrete_volume(
         "volume_recommended_order_m3": volume_ordered,
         "recommendation": (
             f"Disarankan memesan {volume_ordered} m³ "
-            f"(sudah termasuk waste {waste_factor_percent}% dan dibulatkan ke atas)"
+            f"termasuk waste {waste_factor_percent}%."
         )
     }
 
-    # Tambahkan estimasi biaya jika product_id diberikan
     if product_id:
         product = get_product_by_id(product_id)
+
         if product:
-            estimated_cost = volume_ordered * product["price_per_m3"]
+            estimated_cost = (
+                volume_ordered * product["price_per_m3"]
+            )
+
             result["cost_estimation"] = {
                 "product": product["name"],
                 "price_per_m3": product["price_per_m3"],
@@ -404,36 +623,58 @@ def handle_calculate_concrete_volume(
                 "ppn_11_percent": estimated_cost * 0.11,
                 "total_with_ppn": estimated_cost * 1.11,
                 "down_payment_30_percent": estimated_cost * 0.30,
-                "note": "Harga belum termasuk biaya pengiriman di luar radius 30 km dan jasa pompa beton"
+                "note": (
+                    "Estimasi harga. Biaya tambahan pengiriman "
+                    "dan jasa pompa dapat berlaku."
+                )
             }
 
     return result
 
 
-def handle_get_company_information(info_type: str = "semua") -> dict:
-    """Handler: Mengambil informasi perusahaan sesuai tipe yang diminta."""
-    result: dict[str, Any] = {"status": "success", "info_type": info_type}
+# ============================================================
+# COMPANY INFORMATION HANDLER
+# ============================================================
+
+def handle_get_company_information(
+    info_type: str = "semua"
+) -> dict:
+    """Mengambil informasi perusahaan."""
+
+    result: dict[str, Any] = {
+        "status": "success",
+        "info_type": info_type
+    }
 
     if info_type in ("profil", "semua"):
         result["company_profile"] = get_company_info()
+
     if info_type in ("kontak", "semua"):
         company = get_company_info()
+
         result["contact"] = {
-            "phone": company["phone"],
-            "whatsapp": company["whatsapp"],
-            "email": company["email"],
-            "address": company["address"],
-            "operational_hours": company["operational_hours"]
+            "phone": company.get("phone"),
+            "whatsapp": company.get("whatsapp"),
+            "email": company.get("email"),
+            "address": company.get("address"),
+            "operational_hours": company.get("operational_hours")
         }
+
     if info_type in ("pengiriman", "semua"):
         result["delivery_info"] = get_delivery_info()
+
     if info_type in ("pembayaran", "semua"):
         result["payment_info"] = get_payment_info()
+
     if info_type in ("faq", "semua"):
         result["faqs"] = get_company_faqs()
 
     return result
 
+
+# ============================================================
+# ORDER HANDLER - SIMULATION ONLY
+# ============================================================
 
 def handle_create_order_request(
     customer_name: str,
@@ -447,7 +688,8 @@ def handle_create_order_request(
     delivery_date: str,
     notes: str = ""
 ) -> dict:
-    """Handler: Membuat pesanan baru."""
+    """Membuat simulasi pesanan beton tanpa penyimpanan permanen."""
+
     try:
         order = create_order(
             customer_name=customer_name,
@@ -461,31 +703,58 @@ def handle_create_order_request(
             delivery_date=delivery_date,
             notes=notes
         )
+
         return {
-            "status": "success",
-            "message": "Pesanan berhasil dibuat dan menunggu konfirmasi pembayaran DP.",
+            "status": "simulation",
+            "message": (
+                "Simulasi pesanan berhasil dibuat. "
+                "Pesanan ini hanya untuk demonstrasi, "
+                "tidak disimpan secara permanen, dan belum menjadi transaksi resmi."
+            ),
             "order": order,
             "next_steps": [
-                f"Lakukan pembayaran DP sebesar Rp {order['down_payment']:,.0f} (30% dari total)",
-                "Kirim bukti transfer ke WhatsApp kami: +62 812-9000-5678",
-                f"Pesanan akan dikonfirmasi dalam 1x24 jam setelah pembayaran diterima",
-                f"Nomor pesanan Anda: {order['order_id']}"
+                f"Estimasi total harga: Rp {order['total_price']:,.0f}",
+                f"Estimasi DP 30%: Rp {order['down_payment']:,.0f}",
+                f"Nomor simulasi: {order['order_id']}",
+                "Untuk pemesanan resmi, silakan hubungi admin BetonKu."
             ]
         }
-    except ValueError as e:
-        return {"status": "error", "message": str(e)}
-    except Exception as e:
-        return {"status": "error", "message": f"Gagal membuat pesanan: {str(e)}"}
 
+    except ValueError as error:
+        return {
+            "status": "error",
+            "message": str(error)
+        }
+
+    except Exception as error:
+        print(f"[SIMULATION ORDER ERROR] {error}")
+
+        return {
+            "status": "error",
+            "message": "Simulasi pesanan gagal diproses."
+        }
+
+
+# ============================================================
+# ORDER STATUS HANDLER - SAMPLE DATA
+# ============================================================
 
 def handle_check_order_status(order_id: str) -> dict:
-    """Handler: Mengecek status pesanan berdasarkan order ID."""
+    """Memeriksa status pesanan contoh dari JSON."""
+
     order = get_order_by_id(order_id)
+
     if not order:
         return {
             "status": "not_found",
-            "message": f"Pesanan dengan ID '{order_id}' tidak ditemukan.",
-            "suggestion": "Pastikan nomor pesanan benar. Format: BK-YYYY-NNN (contoh: BK-2025-001)"
+            "message": (
+                f"Pesanan dengan ID '{order_id}' tidak ditemukan "
+                "dalam data pesanan demonstrasi."
+            ),
+            "suggestion": (
+                "Contoh nomor pesanan: BK-2025-001. "
+                "Pengecekan hanya menggunakan data contoh."
+            )
         }
 
     status_labels = {
@@ -498,11 +767,23 @@ def handle_check_order_status(order_id: str) -> dict:
 
     return {
         "status": "success",
+        "data_type": "sample",
         "order_id": order["order_id"],
-        "status_label": status_labels.get(order["status"], order["status"]),
-        "order_details": order
+        "status_label": status_labels.get(
+            order["status"],
+            order["status"]
+        ),
+        "order_details": order,
+        "notice": (
+            "Status ini berasal dari data pesanan contoh "
+            "untuk demonstrasi, bukan data transaksi langsung."
+        )
     }
 
+
+# ============================================================
+# COMPLAINT HANDLER - SIMULATION ONLY
+# ============================================================
 
 def handle_submit_complaint(
     customer_name: str,
@@ -514,7 +795,8 @@ def handle_submit_complaint(
     description: str,
     related_order_id: str = ""
 ) -> dict:
-    """Handler: Mencatat keluhan pelanggan baru."""
+    """Membuat simulasi pengaduan tanpa penyimpanan permanen."""
+
     try:
         complaint = create_complaint(
             customer_name=customer_name,
@@ -526,57 +808,92 @@ def handle_submit_complaint(
             description=description,
             related_order_id=related_order_id
         )
+
         return {
-            "status": "success",
-            "message": "Keluhan Anda telah berhasil dicatat dan akan segera ditangani oleh tim kami.",
+            "status": "simulation",
+            "message": (
+                "Simulasi pengaduan berhasil dibuat. "
+                "Pengaduan ini tidak dikirim ke admin "
+                "dan tidak disimpan secara permanen."
+            ),
             "complaint": complaint,
             "next_steps": [
-                f"Nomor tiket keluhan Anda: {complaint['complaint_id']}",
-                "Tim kami akan menghubungi Anda dalam 1x24 jam kerja",
-                "Anda dapat memantau status keluhan dengan nomor tiket di atas",
-                "Untuk keluhan mendesak, hubungi kami di: +62 21 8900-1234"
+                f"Nomor simulasi pengaduan: {complaint['complaint_id']}",
+                "Untuk pengaduan resmi, silakan hubungi admin BetonKu."
             ]
         }
-    except Exception as e:
-        return {"status": "error", "message": f"Gagal mencatat keluhan: {str(e)}"}
 
+    except Exception as error:
+        print(f"[SIMULATION COMPLAINT ERROR] {error}")
+
+        return {
+            "status": "error",
+            "message": "Simulasi pengaduan gagal diproses."
+        }
+
+
+# ============================================================
+# ADMIN HANDOFF HANDLER
+# ============================================================
 
 def handle_request_admin_handoff(
     reason: str,
     customer_name: str = "Pelanggan",
     urgency: str = "normal"
 ) -> dict:
-    """Handler: Memproses permintaan pengalihan ke admin."""
+    """Memberikan informasi kontak admin tanpa mengirim notifikasi."""
+
     urgency_messages = {
-        "normal": "Permintaan Anda telah dicatat. Admin kami akan segera menghubungi Anda.",
-        "segera": "Permintaan Anda ditandai sebagai SEGERA. Admin kami akan menghubungi Anda dalam waktu dekat.",
-        "darurat": "🚨 Permintaan DARURAT diterima! Admin kami akan segera menghubungi Anda sekarang."
+        "normal": (
+            "Berikut informasi kontak admin BetonKu. "
+            "Silakan hubungi admin secara langsung."
+        ),
+        "segera": (
+            "Permintaan Anda membutuhkan penanganan segera. "
+            "Silakan hubungi admin BetonKu secara langsung."
+        ),
+        "darurat": (
+            "Permintaan Anda bersifat mendesak. "
+            "Segera hubungi admin BetonKu melalui nomor berikut."
+        )
     }
+
+    company = get_company_info()
 
     return {
-        "status": "success",
-        "handoff_requested": True,
+        "status": "information_only",
+        "handoff_requested": False,
+        "notification_sent": False,
         "urgency": urgency,
-        "message": urgency_messages.get(urgency, urgency_messages["normal"]),
+        "message": urgency_messages.get(
+            urgency,
+            urgency_messages["normal"]
+        ),
         "contact_options": {
-            "whatsapp": "+62 812-9000-5678",
-            "phone": "+62 21 8900-1234",
-            "email": "info@betonku.co.id",
-            "operational_hours": "Senin - Sabtu: 07.00 - 17.00 WIB"
+            "whatsapp": company.get("whatsapp"),
+            "phone": company.get("phone"),
+            "email": company.get("email"),
+            "operational_hours": company.get("operational_hours")
         },
-        "reason_recorded": reason
+        "reason": reason,
+        "customer_name": customer_name,
+        "notice": (
+            "Sistem demonstrasi ini tidak mengirim notifikasi "
+            "atau meneruskan percakapan secara otomatis kepada admin."
+        )
     }
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# DISPATCHER: Memetakan nama fungsi ke handler yang sesuai
-# ═══════════════════════════════════════════════════════════════════════════════
+# ============================================================
+# TOOL DISPATCHER
+# ============================================================
 
-def dispatch_tool_call(function_name: str, arguments: dict) -> dict:
-    """
-    Dispatcher utama untuk menjalankan tool yang dipanggil oleh AI.
-    Menerima nama fungsi dan argumen, mengembalikan hasil eksekusi.
-    """
+def dispatch_tool_call(
+    function_name: str,
+    arguments: dict
+) -> dict:
+    """Memetakan nama tool ke handler yang sesuai."""
+
     handlers = {
         "get_product_catalog": handle_get_product_catalog,
         "get_product_detail": handle_get_product_detail,
@@ -585,14 +902,32 @@ def dispatch_tool_call(function_name: str, arguments: dict) -> dict:
         "create_order_request": handle_create_order_request,
         "check_order_status": handle_check_order_status,
         "submit_complaint": handle_submit_complaint,
-        "request_admin_handoff": handle_request_admin_handoff,
+        "request_admin_handoff": handle_request_admin_handoff
     }
 
     handler = handlers.get(function_name)
+
     if not handler:
-        return {"status": "error", "message": f"Fungsi '{function_name}' tidak dikenali."}
+        return {
+            "status": "error",
+            "message": f"Fungsi '{function_name}' tidak dikenali."
+        }
 
     try:
         return handler(**arguments)
-    except TypeError as e:
-        return {"status": "error", "message": f"Argumen tidak valid untuk '{function_name}': {str(e)}"}
+
+    except TypeError as error:
+        return {
+            "status": "error",
+            "message": (
+                f"Argumen tidak valid untuk '{function_name}': {str(error)}"
+            )
+        }
+
+    except Exception as error:
+        print(f"[TOOL ERROR] {function_name}: {error}")
+
+        return {
+            "status": "error",
+            "message": "Terjadi kesalahan saat menjalankan fungsi."
+        }
