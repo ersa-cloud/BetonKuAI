@@ -1,0 +1,163 @@
+{
+  "products": [
+    {
+      "id": "K175",
+      "name": "Beton K-175 (f'c 14.5 MPa)",
+      "mutu": "K-175",
+      "fc_mpa": 14.5,
+      "description": "Beton mutu rendah untuk pekerjaan non-struktural. Cocok untuk rabat beton, lantai kerja, dan pondasi ringan.",
+      "applications": ["Lantai kerja", "Rabat beton", "Pondasi rumah sederhana", "Saluran drainase ringan"],
+      "slump": "12 ± 2 cm",
+      "price_per_m3": 840000,
+      "availability": "tersedia",
+      "min_order_m3": 3,
+      "notes": "Tidak direkomendasikan untuk elemen struktural utama"
+    },
+    {
+      "id": "K200",
+      "name": "Beton K-200 (f'c 16.6 MPa)",
+      "mutu": "K-200",
+      "fc_mpa": 16.6,
+      "description": "Beton mutu standar untuk konstruksi perumahan. Ideal untuk pondasi, sloof, kolom, dan balok rumah tinggal.",
+      "applications": ["Pondasi bangunan", "Sloof dan ring balok", "Kolom rumah tinggal", "Plat lantai rumah"],
+      "slump": "12 ± 2 cm",
+      "price_per_m3": 890000,
+      "availability": "tersedia",
+      "min_order_m3": 3,
+      "notes": "Sesuai untuk bangunan 1-2 lantai"
+    },
+    {
+      "id": "K225",
+      "name": "Beton K-225 (f'c 18.7 MPa)",
+      "mutu": "K-225",
+      "fc_mpa": 18.7,
+      "description": "Beton mutu menengah untuk konstruksi bangunan bertingkat rendah dan struktur yang memerlukan kekuatan lebih.",
+      "applications": ["Bangunan 2-3 lantai", "Jalan lingkungan", "Plat jembatan kecil", "Konstruksi komersial ringan"],
+      "slump": "12 ± 2 cm",
+      "price_per_m3": 940000,
+      "availability": "tersedia",
+      "min_order_m3": 3,
+      "notes": "Populer untuk ruko dan bangunan komersial kecil"
+    },
+    {
+      "id": "K250",
+      "name": "Beton K-250 (f'c 20.8 MPa)",
+      "mutu": "K-250",
+      "fc_mpa": 20.8,
+      "description": "Beton mutu menengah-atas untuk gedung bertingkat sedang dan infrastruktur. Standar umum konstruksi komersial.",
+      "applications": ["Gedung bertingkat 3-5 lantai", "Jalan raya", "Parkir bertingkat", "Pondasi mesin industri"],
+      "slump": "12 ± 2 cm",
+      "price_per_m3": 995000,
+      "availability": "tersedia",
+      "min_order_m3": 3,
+      "notes": "Direkomendasikan untuk proyek komersial standar"
+    },
+    {
+      "id": "K300",
+      "name": "Beton K-300 (f'c 24.9 MPa)",
+      "mutu": "K-300",
+      "fc_mpa": 24.9,
+      "description": "Beton mutu tinggi untuk konstruksi gedung bertingkat dan infrastruktur besar. Memenuhi standar bangunan modern.",
+      "applications": ["Gedung bertingkat tinggi", "Jembatan", "Overpass", "Struktur industri berat"],
+      "slump": "12 ± 2 cm",
+      "price_per_m3": 1085000,
+      "availability": "tersedia",
+      "min_order_m3": 5,
+      "notes": "Memerlukan perencanaan mix design khusus"
+    },
+    {
+      "id": "K350",
+      "name": "Beton K-350 (f'c 29.1 MPa)",
+      "mutu": "K-350",
+      "fc_mpa": 29.1,
+      "description": "Beton mutu sangat tinggi untuk proyek infrastruktur besar dan gedung pencakar langit.",
+      "applications": ["Gedung pencakar langit", "Jembatan layang", "Bendungan", "Terowongan"],
+      "slump": "12 ± 2 cm",
+      "price_per_m3": 1195000,
+      "availability": "tersedia",
+      "min_order_m3": 10,
+      "notes": "Konsultasi teknis wajib sebelum pemesanan"
+    },
+    {
+      "id": "K400",
+      "name": "Beton K-400 (f'c 33.2 MPa)",
+      "mutu": "K-400",
+      "fc_mpa": 33.2,
+      "description": "Beton mutu ultra-tinggi untuk proyek infrastruktur kritis dan bangunan dengan beban sangat besar.",
+      "applications": ["Infrastruktur kritis", "Pelabuhan", "Bandara", "Struktur bawah tanah dalam"],
+      "slump": "10 ± 2 cm",
+      "price_per_m3": 1350000,
+      "availability": "indent",
+      "min_order_m3": 20,
+      "notes": "Pemesanan minimum 7 hari kerja sebelumnya. Konsultasi teknis wajib."
+    },
+    {
+      "id": "SC",
+      "name": "Self Compacting Concrete (SCC)",
+      "mutu": "SCC",
+      "fc_mpa": 25.0,
+      "description": "Beton yang dapat mengalir dan memadat sendiri tanpa getaran. Ideal untuk elemen struktur dengan tulangan padat.",
+      "applications": ["Kolom tulangan padat", "Precast element", "Struktur arsitektural ekspos", "Dinding tipis"],
+      "slump_flow": "65 ± 5 cm",
+      "price_per_m3": 1250000,
+      "availability": "tersedia",
+      "min_order_m3": 5,
+      "notes": "Tidak memerlukan alat vibrator. Penggunaan khusus sesuai rekomendasi teknisi."
+    },
+    {
+      "id": "FC",
+      "name": "Fiber Reinforced Concrete (FRC)",
+      "mutu": "FRC",
+      "fc_mpa": 28.0,
+      "description": "Beton dengan tambahan serat baja atau polypropylene untuk meningkatkan ketahanan retak dan daktilitas.",
+      "applications": ["Lantai industri", "Area parkir", "Pelat jembatan", "Struktur tahan gempa"],
+      "slump": "12 ± 2 cm",
+      "price_per_m3": 1420000,
+      "availability": "tersedia",
+      "min_order_m3": 5,
+      "notes": "Tersedia dengan serat baja (steel fiber) atau serat polypropylene"
+    }
+  ],
+  "additional_services": [
+    {
+      "id": "pump_standard",
+      "name": "Jasa Concrete Pump Standar",
+      "description": "Sewa concrete pump untuk area yang tidak terjangkau truk mixer langsung",
+      "price": 3500000,
+      "unit": "per hari (8 jam)",
+      "availability": "tersedia"
+    },
+    {
+      "id": "pump_boom",
+      "name": "Jasa Concrete Pump Boom/High-Rise",
+      "description": "Sewa concrete pump boom untuk gedung tinggi dan proyek dengan ketinggian di atas 20 meter",
+      "price": 5500000,
+      "unit": "per hari (8 jam)",
+      "availability": "tersedia"
+    },
+    {
+      "id": "mix_design",
+      "name": "Jasa Mix Design Khusus",
+      "description": "Perencanaan mix design beton sesuai spesifikasi proyek khusus",
+      "price": 2500000,
+      "unit": "per proyek",
+      "availability": "tersedia"
+    },
+    {
+      "id": "quality_test",
+      "name": "Sertifikat Uji Kualitas",
+      "description": "Pengambilan sampel dan pengujian kuat tekan di laboratorium bersertifikat",
+      "price": 350000,
+      "unit": "per seri pengujian (3 sampel)",
+      "availability": "tersedia"
+    }
+  ],
+  "price_notes": [
+    "Harga berlaku per 1 November 2025",
+    "Harga sudah termasuk ongkos kirim radius 30 km dari batching plant",
+    "Biaya tambahan Rp 15.000/m³ per 10 km di luar radius 30 km",
+    "Harga belum termasuk PPN 11%",
+    "Untuk pemesanan di atas 50 m³ dapat didiskusikan harga khusus",
+    "Harga dapat berubah sewaktu-waktu mengikuti fluktuasi bahan baku"
+  ]
+}

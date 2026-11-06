@@ -1,0 +1,53 @@
+{
+  "complaints": [
+    {
+      "complaint_id": "KL-2025-001",
+      "customer_name": "PT Bangun Jaya Abadi",
+      "contact_person": "Budi Santoso",
+      "phone": "0812-3456-7890",
+      "email": "budi@bangunjaya.co.id",
+      "related_order_id": "BK-2025-001",
+      "category": "kualitas",
+      "subject": "Beton tidak sesuai spesifikasi slump",
+      "description": "Pada pengiriman tanggal 5 November 2025, nilai slump yang diterima di lapangan hanya 8 cm, padahal spesifikasi yang diminta adalah 12 ± 2 cm.",
+      "priority": "tinggi",
+      "status": "dalam_proses",
+      "assigned_to": "Tim Quality Control",
+      "created_at": "2025-11-05T16:30:00Z",
+      "updated_at": "2025-11-06T09:00:00Z",
+      "resolution": null
+    },
+    {
+      "complaint_id": "KL-2025-002",
+      "customer_name": "CV Mitra Konstruksi",
+      "contact_person": "Dewi Rahayu",
+      "phone": "0813-5678-9012",
+      "email": "dewi@mitrakonstruksi.com",
+      "related_order_id": "BK-2025-002",
+      "category": "pengiriman",
+      "subject": "Truk terlambat 3 jam dari jadwal",
+      "description": "Truk mixer tiba 3 jam terlambat dari jadwal yang disepakati, menyebabkan penghentian pekerjaan dan biaya tambahan untuk tenaga kerja.",
+      "priority": "sedang",
+      "status": "selesai",
+      "assigned_to": "Tim Operasional",
+      "created_at": "2025-10-21T10:00:00Z",
+      "updated_at": "2025-10-22T15:00:00Z",
+      "resolution": "Telah diberikan kompensasi diskon 5% untuk pemesanan berikutnya dan permohonan maaf tertulis dari manajemen."
+    }
+  ],
+  "complaint_categories": {
+    "kualitas": "Keluhan terkait kualitas beton",
+    "pengiriman": "Keluhan terkait keterlambatan atau masalah pengiriman",
+    "administrasi": "Keluhan terkait tagihan, dokumen, atau administrasi",
+    "layanan": "Keluhan terkait pelayanan staff atau customer service",
+    "lainnya": "Keluhan lain-lain"
+  },
+  "complaint_statuses": {
+    "diterima": "Keluhan telah diterima dan sedang direview",
+    "dalam_proses": "Keluhan sedang ditangani oleh tim terkait",
+    "menunggu_feedback": "Menunggu konfirmasi dari pelanggan",
+    "selesai": "Keluhan telah diselesaikan",
+    "ditutup": "Keluhan ditutup"
+  },
+  "last_complaint_number": 2
+}

@@ -1,0 +1,16 @@
+{
+  "name": "betonku-ai-assistant",
+  "version": "1.0.0",
+  "description": "BetonKu AI Assistant — AI Customer Service untuk beton ready-mix",
+  "scripts": {
+    "css:build": "npx @tailwindcss/cli -i ./static/css/tailwind.input.css -o ./static/css/tailwind.output.css --minify",
+    "css:watch": "npx @tailwindcss/cli -i ./static/css/tailwind.input.css -o ./static/css/tailwind.output.css --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.4",
+    "tailwindcss": "^4.3.4"
+  }
+}

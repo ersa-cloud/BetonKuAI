@@ -1,0 +1,85 @@
+{
+  "company": {
+    "name": "BetonKu",
+    "tagline": "Solusi Beton Ready-Mix Terpercaya",
+    "description": "BetonKu adalah perusahaan terkemuka dalam produksi dan penjualan beton ready-mix berkualitas tinggi. Berdiri sejak 2005, kami telah melayani ribuan proyek konstruksi mulai dari perumahan, gedung komersial, infrastruktur jalan, hingga proyek industri di seluruh Jabodetabek dan sekitarnya.",
+    "founded": "2005",
+    "address": "Jl. Industri Raya No. 88, Kawasan Industri Cikarang Barat, Bekasi, Jawa Barat 17530",
+    "phone": "+62 21 8900-1234",
+    "whatsapp": "+62 812-9000-5678",
+    "email": "info@betonku.co.id",
+    "website": "www.betonku.co.id",
+    "operational_hours": "Senin - Sabtu: 07.00 - 17.00 WIB",
+    "coverage_area": ["Jakarta", "Bogor", "Depok", "Tangerang", "Bekasi", "Karawang", "Purwakarta"],
+    "certifications": ["SNI ISO 9001:2015", "SNI 2847:2019", "Sertifikat ASTM C94"],
+    "fleet": "50+ unit truk mixer",
+    "capacity": "1.500 m³/hari",
+    "batching_plants": [
+      {
+        "name": "Plant Cikarang",
+        "address": "Jl. Industri Raya No. 88, Cikarang Barat",
+        "capacity": "600 m³/hari"
+      },
+      {
+        "name": "Plant Cibitung",
+        "address": "Jl. Raya Cibitung KM 45, Bekasi",
+        "capacity": "500 m³/hari"
+      },
+      {
+        "name": "Plant Cikampek",
+        "address": "Jl. Raya Cikampek No. 12, Karawang",
+        "capacity": "400 m³/hari"
+      }
+    ]
+  },
+  "value_propositions": [
+    "Kualitas terjamin dengan quality control ketat di setiap batch produksi",
+    "Pengiriman tepat waktu dengan armada 50+ truk mixer modern",
+    "Harga kompetitif dengan transparansi biaya tanpa biaya tersembunyi",
+    "Tim teknis berpengalaman siap konsultasi 24/7",
+    "Sertifikasi SNI dan standar internasional",
+    "Layanan jangkauan luas se-Jabodetabek dan Karawang"
+  ],
+  "payment_terms": {
+    "down_payment": "30% dari total nilai pesanan",
+    "payment_methods": ["Transfer Bank BCA", "Transfer Bank Mandiri", "Transfer Bank BNI", "Giro/Cek Perusahaan"],
+    "credit_terms": "Net 30 hari untuk pelanggan korporasi dengan credit limit yang telah disetujui",
+    "bank_accounts": [
+      {
+        "bank": "BCA",
+        "account_number": "123-456-7890",
+        "account_name": "PT BetonKu Indonesia"
+      },
+      {
+        "bank": "Mandiri",
+        "account_number": "098-765-4321",
+        "account_name": "PT BetonKu Indonesia"
+      }
+    ]
+  },
+  "delivery_info": {
+    "min_order": "3 m³ per pengiriman",
+    "delivery_radius": "Maksimal 90 km dari batching plant terdekat",
+    "delivery_fee": "Termasuk dalam harga (dalam radius 30 km). Biaya tambahan Rp 15.000/m³ per 10 km di luar radius 30 km",
+    "lead_time": "Minimum 1 hari kerja setelah konfirmasi pembayaran",
+    "waiting_time": "Maksimal 2 jam di lokasi proyek, biaya tunggu Rp 200.000/jam setelahnya"
+  },
+  "faqs": [
+    {
+      "question": "Berapa lama beton bisa digunakan setelah keluar dari truk mixer?",
+      "answer": "Beton ready-mix harus digunakan dalam 90 menit atau sebelum drum berputar 300 kali sejak pencampuran di batching plant. Setelah itu kualitas beton tidak dapat dijamin."
+    },
+    {
+      "question": "Apakah BetonKu menyediakan jasa pompa beton?",
+      "answer": "Ya, BetonKu menyediakan jasa concrete pump dengan harga sewa Rp 3.500.000 per hari (8 jam) untuk concrete pump standar, dan Rp 5.500.000 per hari untuk concrete pump boom/high-rise."
+    },
+    {
+      "question": "Bagaimana cara pengujian kualitas beton?",
+      "answer": "Kami melakukan uji slump di lokasi pengiriman (nilai slump disesuaikan dengan spesifikasi), pengambilan sampel beton untuk uji kuat tekan (7 hari dan 28 hari), serta menyediakan sertifikat hasil uji jika diminta."
+    },
+    {
+      "question": "Apakah ada minimum order?",
+      "answer": "Minimum order adalah 3 m³ per pengiriman. Untuk proyek besar di atas 50 m³, kami dapat mendiskusikan harga khusus."
+    }
+  ]
+}

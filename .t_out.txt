@@ -1,0 +1,4 @@
+[OK] OpenAI API Key terdeteksi (model: gpt-4o-mini)
+[START] BetonKu AI Assistant siap dijalankan!
+INFO:     127.0.0.1:58938 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58938 - "POST /api/chat HTTP/1.1" 500 Internal Server Error

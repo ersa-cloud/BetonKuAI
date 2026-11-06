@@ -1,0 +1,72 @@
+{
+  "orders": [
+    {
+      "order_id": "BK-2025-001",
+      "customer_name": "PT Bangun Jaya Abadi",
+      "contact_person": "Budi Santoso",
+      "phone": "0812-3456-7890",
+      "email": "budi@bangunjaya.co.id",
+      "project_name": "Pembangunan Gedung Kantor 5 Lantai",
+      "project_address": "Jl. Sudirman No. 45, Jakarta Selatan",
+      "product_id": "K300",
+      "product_name": "Beton K-300",
+      "volume_m3": 120,
+      "price_per_m3": 1085000,
+      "total_price": 130200000,
+      "down_payment": 39060000,
+      "status": "dalam_pengiriman",
+      "order_date": "2025-10-28",
+      "delivery_date": "2025-11-05",
+      "notes": "Pengiriman bertahap: 40 m³/hari selama 3 hari",
+      "created_at": "2025-10-28T09:15:00Z"
+    },
+    {
+      "order_id": "BK-2025-002",
+      "customer_name": "CV Mitra Konstruksi",
+      "contact_person": "Dewi Rahayu",
+      "phone": "0813-5678-9012",
+      "email": "dewi@mitrakonstruksi.com",
+      "project_name": "Perumahan Griya Asri Blok B",
+      "project_address": "Jl. Raya Bekasi KM 25, Bekasi Timur",
+      "product_id": "K200",
+      "product_name": "Beton K-200",
+      "volume_m3": 45,
+      "price_per_m3": 890000,
+      "total_price": 40050000,
+      "down_payment": 12015000,
+      "status": "selesai",
+      "order_date": "2025-10-15",
+      "delivery_date": "2025-10-20",
+      "notes": "Pengiriman 1 kali, sudah selesai",
+      "created_at": "2025-10-15T14:30:00Z"
+    },
+    {
+      "order_id": "BK-2025-003",
+      "customer_name": "Bapak Hendra Wijaya",
+      "contact_person": "Hendra Wijaya",
+      "phone": "0857-1234-5678",
+      "email": "hendra.w@gmail.com",
+      "project_name": "Rumah Tinggal 2 Lantai",
+      "project_address": "Jl. Melati No. 7, Depok",
+      "product_id": "K225",
+      "product_name": "Beton K-225",
+      "volume_m3": 15,
+      "price_per_m3": 940000,
+      "total_price": 14100000,
+      "down_payment": 4230000,
+      "status": "menunggu_konfirmasi",
+      "order_date": "2025-11-04",
+      "delivery_date": "2025-11-08",
+      "notes": "Untuk pengecoran pondasi dan kolom lantai 1",
+      "created_at": "2025-11-04T11:00:00Z"
+    }
+  ],
+  "order_statuses": {
+    "menunggu_konfirmasi": "Menunggu konfirmasi pembayaran DP",
+    "dikonfirmasi": "Pesanan dikonfirmasi, dijadwalkan pengiriman",
+    "dalam_pengiriman": "Sedang dalam proses pengiriman",
+    "selesai": "Pesanan telah selesai",
+    "dibatalkan": "Pesanan dibatalkan"
+  },
+  "last_order_number": 3
+}
